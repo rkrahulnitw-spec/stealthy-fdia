@@ -43,6 +43,10 @@ Networks: IEEE 14-bus and 30-bus test cases, UW Power Systems Test Case Archive,
 
 ## Status
 
-IEEE-30's figures are final. **IEEE-14's are being recomputed** with the same, more thorough
-search IEEE-30 received — its worst case rises from +2.26 to at least +2.84 MW. All IEEE-14
-numbers here will improve; none will get worse.
+**IEEE-30 is final and complete** — all 8,760 hours.
+
+**IEEE-14 is mid-revision.** Its hours are being re-searched with the same, more thorough
+method IEEE-30 received; its worst case rises from +2.26 to at least +2.84 MW, so every
+IEEE-14 number here will improve. 17 of its 8,760 hourly grid states were being recomputed
+when this snapshot was generated and are absent from the Grid-model scrubber — the app
+falls back to the nearest available hour and says so. IEEE-30 has no gaps.
