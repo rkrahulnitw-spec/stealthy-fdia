@@ -1,0 +1,1 @@
+[{"name":"yearly","rows":1},{"name":"monthly","rows":12},{"name":"weekly","rows":53},{"name":"daily","rows":365},{"name":"perbus_voltage","rows":360},{"name":"generator_power","rows":72},{"name":"perbus_baseline","rows":30},{"name":"top_loss_hours","rows":50},{"name":"top_cost_hours","rows":50}]

@@ -1,0 +1,1 @@
+[{"sys":"ieee14","label":"IEEE-14","n_bus":14,"n_branch":20,"n_gen":5,"base_mw":259.0,"hours_baseline":8760,"hours_attack":8760,"ready":true,"baseline_ready":true},{"sys":"ieee30","label":"IEEE-30","n_bus":30,"n_branch":41,"n_gen":6,"base_mw":283.4,"hours_baseline":8760,"hours_attack":8760,"ready":true,"baseline_ready":true}]

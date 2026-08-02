@@ -1,0 +1,1 @@
+{"columns":["scope","load_MW","loss_before_MW","loss_after_MW","cost_before","cost_after","dloss_mean_MW","dloss_max_MW","dcost_mean","dcost_max"],"rows":[["YEAR (8760 h)",148.4,4.79,4.33,3899.0,3997.0,-0.456,4.91,98.0,1784.0]]}
