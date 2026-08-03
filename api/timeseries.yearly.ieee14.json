@@ -1,1 +1,1 @@
-[{"scope":"YEAR (8760 h)","load_MW":135.6,"loss_before_MW":3.72,"loss_after_MW":3.27,"cost_before":3544.0,"cost_after":3725.0,"dloss_mean_MW":-0.454,"dloss_max_MW":2.26,"dcost_mean":181.0,"dcost_max":1867.0}]
+[{"scope":"YEAR (8760 h)","load_MW":135.6,"loss_before_MW":3.72,"loss_after_MW":3.28,"cost_before":3544.0,"cost_after":3727.0,"dloss_mean_MW":-0.443,"dloss_max_MW":2.84,"dcost_mean":183.0,"dcost_max":1867.0}]

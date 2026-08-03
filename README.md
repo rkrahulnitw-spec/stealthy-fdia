@@ -17,9 +17,10 @@ Attack damage has **two opposite regimes**:
 |---|---|---|
 | valid stealthy attacks | 8,346 / 8,760 | 8,360 / 8,760 |
 | **caught by the detector** | **0** | **0** |
-| worst extra losses | +2.26 MW (+31%) | **+4.91 MW (+42%)** |
+| worst extra losses | +2.84 MW (+38%) | **+4.91 MW (+42%)** |
 | worst extra cost | +$1,867/h | +$1,784/h |
-| extra cost over the year | $1.51 M | $0.82 M |
+| hours with loss damage | 207 | **210** |
+| extra cost over the year | $1.53 M | $0.82 M |
 
 Physical **loss** damage happens only near the annual peak. **Economic** damage is broad,
 year-round, and largest at *light* load — the attack shifts generation off cheap units onto
@@ -43,10 +44,6 @@ Networks: IEEE 14-bus and 30-bus test cases, UW Power Systems Test Case Archive,
 
 ## Status
 
-**IEEE-30 is final and complete** — all 8,760 hours.
-
-**IEEE-14 is mid-revision.** Its hours are being re-searched with the same, more thorough
-method IEEE-30 received; its worst case rises from +2.26 to at least +2.84 MW, so every
-IEEE-14 number here will improve. 17 of its 8,760 hourly grid states were being recomputed
-when this snapshot was generated and are absent from the Grid-model scrubber — the app
-falls back to the nearest available hour and says so. IEEE-30 has no gaps.
+**Both systems complete and final.** IEEE-14 was re-searched with the identical protocol
+IEEE-30 received (best-of-3 independent restarts at 20x30 on every damage-carrying hour),
+so the two are searched equally hard and their figures are directly comparable.
