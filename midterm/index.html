@@ -121,6 +121,32 @@ footer{border-top:1px solid var(--line);padding:18px 26px;color:var(--mute);
 .formula .where b{color:var(--navy)}
 .formula .where span{display:inline-block;margin-right:18px;white-space:nowrap}
 .formula .where i{color:var(--ink);font-weight:700;font-style:italic}
+.formula.sm .expr{font-size:20px;line-height:1.7}
+
+/* ---------------- maths cards ---------------- */
+.mathcard{border:1px solid var(--line);border-radius:10px;margin:22px 0;
+          overflow:hidden;background:#fff}
+.mathcard>header{background:var(--band);padding:12px 18px;display:flex;
+          align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+.mathcard .mnum{flex:none;width:32px;height:32px;border-radius:50%;
+          background:var(--navy);color:#fff;font-weight:700;font-size:15px;
+          display:flex;align-items:center;justify-content:center}
+.mathcard h3{margin:0;color:var(--navy);font-size:18px}
+.mathcard .inner{padding:4px 18px 16px}
+.mathcard .formula{margin:14px 0}
+.why{border-left:4px solid var(--teal);background:#E7F4F2;border-radius:0 8px 8px 0;
+     padding:11px 16px;margin:14px 0 4px;font-size:15px;color:#123F3C}
+.why b{color:var(--teal)}
+.steps{counter-reset:st;list-style:none;margin:12px 0;padding:0}
+.steps li{position:relative;padding:6px 0 6px 42px;font-size:15px;
+     border-bottom:1px dashed var(--line)}
+.steps li:last-child{border-bottom:0}
+.steps li::before{counter-increment:st;content:"Step " counter(st);
+     position:absolute;left:0;top:7px;font-size:11px;font-weight:700;
+     color:var(--mute);letter-spacing:.03em}
+.steps code{font-family:var(--mono);font-size:14.5px;color:var(--navy)}
+.pointer{border:1px dashed var(--line);border-radius:8px;padding:10px 14px;
+     margin:12px 0;font-size:14.5px;color:var(--mute);font-style:italic}
 
 /* ---------------- code ---------------- */
 .codewrap{border:1px solid var(--line);border-radius:9px;overflow:hidden;
@@ -265,62 +291,371 @@ footer{border-top:1px solid var(--line);padding:18px 26px;color:var(--mute);
   <h2>What is state estimation?</h2>
   <p>Meters are noisy and redundant, so the control centre does not read the
   state &mdash; it <b>estimates</b> it. Weighted Least Squares finds the state
-  that minimises the weighted squared residual between the actual and the
-  predicted measurements:</p>
-
-  <div class="formula">
-    <div class="expr">
-      <i>J</i>(<i>x</i>) <span class="op">=</span>
-      &sum;<sub>&thinsp;<i>i</i>&thinsp;=&thinsp;1</sub><sup>&thinsp;<i>m</i></sup>
-      <span style="font-size:.92em">
-        [ <i>z</i><sub><i>i</i></sub> <span class="op">&minus;</span>
-        <i>h</i><sub><i>i</i></sub>(<i>x</i>) ]<sup>2</sup>
-      </span>
-      <span class="op">&frasl;</span>
-      <i>&sigma;</i><sub><i>i</i></sub><sup>2</sup>
-    </div>
-    <div class="where"><b>where</b>
-      <span><i>z</i> = meter readings</span>
-      <span><i>h</i>(<i>x</i>) = AC measurement function</span>
-      <span><i>&sigma;</i> = meter standard deviation</span>
-      <span><i>m</i> = number of measurements</span>
-    </div>
-  </div>
-
+  that best explains all the readings at once, weighting each meter by how
+  trustworthy it is.</p>
   <ul>
-    <li>Solved by Gauss&ndash;Newton iteration using the Jacobian
-    <b>H</b>&nbsp;=&nbsp;&part;<i>h</i>/&part;<i>x</i>.</li>
-    <li>Output: every bus voltage magnitude and angle &mdash;
-    <i>n</i>&nbsp;=&nbsp;2<i>n</i><sub>b</sub>&nbsp;&minus;&nbsp;1 states, the
-    slack angle being the reference.</li>
-    <li>The surplus of measurements over states is the redundancy that makes
-    bad-data detection possible at all.</li>
+    <li>Output: every bus voltage magnitude and angle &mdash; the picture of
+    the grid the operator believes and acts upon.</li>
+    <li>Because there are more meters than unknowns, the surplus (the
+    <b>redundancy</b>) can be used to spot readings that disagree with the
+    rest.</li>
   </ul>
 
   <h2>What is bad data detection?</h2>
-  <p>At the converged estimate the residual <i>J</i> follows a chi-square
-  distribution with <i>&nu;</i>&nbsp;=&nbsp;<i>m</i>&nbsp;&minus;&nbsp;<i>n</i>
-  degrees of freedom. If it exceeds the 95&nbsp;% threshold, the operator
-  declares bad data and rejects the estimate:</p>
+  <p>After estimating, the control centre checks how well the estimate explains
+  the readings. If the mismatch is larger than statistics says it should be,
+  it declares bad data and rejects the estimate. This is the alarm a stealthy
+  attack has to defeat &mdash; and it is the only line of defence in the
+  classical chain.</p>
+  <div class="callout warn">An attack is <b>stealthy</b> when it leaves that
+  mismatch essentially unchanged &mdash; so the alarm never fires, at any
+  confidence level.</div>
+  <div class="pointer">Every equation behind this &mdash; the AC power flow,
+  the estimator, the detector, the attack construction and the search
+  &mdash; is set out with its symbols and its significance in the
+  <b>Mathematics</b> tab.</div>
+</section>
 
-  <div class="formula">
-    <div class="expr">
-      <i>J</i>(<i>x&#770;</i>) <span class="op">&gt;</span>
-      <i>&chi;</i><sup>2</sup><sub>&thinsp;0.95,&thinsp;<i>&nu;</i></sub>
-      <span class="op">&rArr;</span>
-      <span style="color:var(--red)">bad data detected</span>
-    </div>
-    <div class="where"><b>where</b>
-      <span><i>&nu;</i> = <i>m</i> &minus; <i>n</i> = redundancy</span>
-      <span>IEEE-14: <i>&nu;</i> = 95, threshold 118.75</span>
-      <span>IEEE-30: <i>&nu;</i> = 195, threshold 228.58</span>
+<!-- ========================================================= MATHEMATICS -->
+<section id="maths">
+  <h2>The mathematics behind the project</h2>
+  <p class="lead">Eight expressions carry the whole study. Each one below is
+  given with its symbols defined and, more importantly, with the reason it
+  matters to this particular project.</p>
+
+  <!-- 1 -->
+  <div class="mathcard">
+    <header><div class="mnum">1</div><h3>AC power flow &mdash; the nonlinear network equations</h3></header>
+    <div class="inner">
+      <p>How much real and reactive power is injected at a bus, given the
+      voltages and angles everywhere in the network.</p>
+      <div class="formula">
+        <div class="expr">
+          <i>P</i><sub><i>k</i></sub> <span class="op">=</span>
+          <i>V</i><sub><i>k</i></sub>
+          &sum;<sub><i>m</i></sub> <i>V</i><sub><i>m</i></sub>
+          ( <i>G</i><sub><i>km</i></sub> cos&thinsp;<i>&theta;</i><sub><i>km</i></sub>
+          <span class="op">+</span>
+          <i>B</i><sub><i>km</i></sub> sin&thinsp;<i>&theta;</i><sub><i>km</i></sub> )
+        </div>
+        <div class="expr" style="padding-top:0">
+          <i>Q</i><sub><i>k</i></sub> <span class="op">=</span>
+          <i>V</i><sub><i>k</i></sub>
+          &sum;<sub><i>m</i></sub> <i>V</i><sub><i>m</i></sub>
+          ( <i>G</i><sub><i>km</i></sub> sin&thinsp;<i>&theta;</i><sub><i>km</i></sub>
+          <span class="op">&minus;</span>
+          <i>B</i><sub><i>km</i></sub> cos&thinsp;<i>&theta;</i><sub><i>km</i></sub> )
+        </div>
+        <div class="where"><b>where</b>
+          <span><i>V</i> = voltage magnitude</span>
+          <span><i>&theta;</i><sub><i>km</i></sub> = <i>&theta;</i><sub><i>k</i></sub> &minus; <i>&theta;</i><sub><i>m</i></sub></span>
+          <span><i>G</i> + j<i>B</i> = Y<sub>bus</sub></span>
+        </div>
+      </div>
+      <div class="why"><b>Why it matters.</b> These equations are
+      <i>nonlinear</i> in both voltage and angle. The DC model used by most of
+      the literature linearises them by fixing every voltage at 1.0 pu and
+      discarding reactive power &mdash; which also forces transmission loss to
+      be exactly zero. Since this project measures loss in MW, the full
+      nonlinear form is not a refinement, it is a requirement.</div>
     </div>
   </div>
 
-  <div class="wrap"><table id="bddTable"></table></div>
-  <div class="callout warn">An attack is <b>stealthy</b> when it leaves
-  <i>J</i> essentially unchanged &mdash; so the alarm never fires, at any
-  confidence level.</div>
+  <!-- 2 -->
+  <div class="mathcard">
+    <header><div class="mnum">2</div><h3>The measurement model</h3></header>
+    <div class="inner">
+      <p>What the SCADA system actually delivers to the control centre.</p>
+      <div class="formula">
+        <div class="expr">
+          <b>z</b> <span class="op">=</span> <i>h</i>(<b>x</b>)
+          <span class="op">+</span> <b>e</b>
+          <span style="display:inline-block;width:30px"></span>
+          <b>e</b> ~ <i>N</i>(0, <b>R</b>)
+        </div>
+        <div class="where"><b>where</b>
+          <span><b>z</b> = the <i>m</i> meter readings</span>
+          <span><b>x</b> = [ <i>&theta;</i><sub>2</sub> &hellip; <i>&theta;</i><sub><i>n</i></sub>, <i>V</i><sub>1</sub> &hellip; <i>V</i><sub><i>n</i></sub> ]</span>
+          <span><b>R</b> = diag(<i>&sigma;</i><sub>1</sub><sup>2</sup> &hellip; <i>&sigma;</i><sub><i>m</i></sub><sup>2</sup>)</span>
+        </div>
+      </div>
+      <div class="wrap"><table>
+        <thead><tr><th>Measurement type</th><th>How many</th></tr></thead>
+        <tbody>
+          <tr><td>Bus voltage magnitude, real injection, reactive injection</td><td>3 <i>n</i><sub>b</sub></td></tr>
+          <tr><td>Line real and reactive flow, both directions</td><td>4 <i>n</i><sub>&#8467;</sub></td></tr>
+          <tr><td><b>Total <i>m</i> = 3<i>n</i><sub>b</sub> + 4<i>n</i><sub>&#8467;</sub></b></td><td><b>122 (IEEE-14) &nbsp; 254 (IEEE-30)</b></td></tr>
+        </tbody>
+      </table></div>
+      <div class="why"><b>Why it matters.</b> <i>h</i>(&middot;) is the same
+      nonlinear function from expression 1, so the meters and the estimator
+      speak the same language. There are far more measurements than unknown
+      states; that surplus, <i>&nu;</i> = <i>m</i> &minus; <i>n</i>, is the
+      <b>redundancy</b> which makes it possible to detect a bad reading at all.
+      Without it, no detector could exist &mdash; and neither could a
+      meaningful notion of stealth.</div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="mathcard">
+    <header><div class="mnum">3</div><h3>Weighted Least Squares state estimation</h3></header>
+    <div class="inner">
+      <p>Recovering the most credible operating state from noisy, conflicting
+      readings.</p>
+      <div class="formula">
+        <div class="expr">
+          <i>J</i>(<b>x</b>) <span class="op">=</span>
+          &sum;<sub><i>i</i></sub>
+          [ <i>z</i><sub><i>i</i></sub> <span class="op">&minus;</span>
+          <i>h</i><sub><i>i</i></sub>(<b>x</b>) ]<sup>2</sup>
+          <span class="op">&frasl;</span>
+          <i>&sigma;</i><sub><i>i</i></sub><sup>2</sup>
+          <span style="display:inline-block;width:26px"></span>
+          <b>x&#770;</b> <span class="op">=</span> arg&thinsp;min <i>J</i>(<b>x</b>)
+        </div>
+        <div class="where"><b>where</b>
+          <span>each meter is weighted by 1&frasl;<i>&sigma;</i><sup>2</sup></span>
+          <span>so precise meters count for more</span>
+        </div>
+      </div>
+      <p>The minimum has no closed form, so it is reached by Gauss&ndash;Newton
+      iteration:</p>
+      <div class="formula sm">
+        <div class="expr">
+          <b>x</b><sup>(<i>k</i>+1)</sup> <span class="op">=</span>
+          <b>x</b><sup>(<i>k</i>)</sup> <span class="op">+</span>
+          [ <b>H</b><sup>T</sup><b>R</b><sup>&minus;1</sup><b>H</b> ]<sup>&minus;1</sup>
+          <b>H</b><sup>T</sup><b>R</b><sup>&minus;1</sup>
+          [ <b>z</b> <span class="op">&minus;</span> <i>h</i>(<b>x</b><sup>(<i>k</i>)</sup>) ]
+        </div>
+        <div class="where"><b>where</b>
+          <span><b>H</b> = &part;<i>h</i>/&part;<b>x</b>, the Jacobian</span>
+          <span>evaluated afresh at every iteration</span>
+        </div>
+      </div>
+      <div class="why"><b>Why it matters.</b> The control centre never sees the
+      true state &mdash; it sees <b>x&#770;</b>. Every downstream decision, above
+      all the economic dispatch, is computed from this estimate. Corrupt
+      <b>x&#770;</b> and you corrupt every decision that follows, without ever
+      touching a single piece of physical equipment. That is the entire premise
+      of a false data injection attack.<br><br>
+      In this project <b>H</b> is derived <i>analytically</i> rather than by
+      finite differences &mdash; 109&times; faster, and the single change that
+      made solving all 8,760 hours affordable.</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="mathcard">
+    <header><div class="mnum">4</div><h3>Chi-square bad data detection</h3></header>
+    <div class="inner">
+      <p>The statistical test that decides whether the readings can be trusted.</p>
+      <div class="formula">
+        <div class="expr">
+          <i>J</i>(<b>x&#770;</b>) ~ <i>&chi;</i><sup>2</sup>(<i>&nu;</i>),
+          <span style="display:inline-block;width:14px"></span>
+          <i>&nu;</i> <span class="op">=</span> <i>m</i>
+          <span class="op">&minus;</span> <i>n</i>
+        </div>
+        <div class="expr" style="padding-top:0">
+          <i>J</i>(<b>x&#770;</b>) <span class="op">&gt;</span>
+          <i>&chi;</i><sup>2</sup><sub>&thinsp;0.95,&thinsp;<i>&nu;</i></sub>
+          <span class="op">&rArr;</span>
+          <span style="color:var(--red)">bad data declared</span>
+        </div>
+        <div class="where"><b>thresholds</b>
+          <span>IEEE-14: <i>&nu;</i> = 95, limit 118.75</span>
+          <span>IEEE-30: <i>&nu;</i> = 195, limit 228.58</span>
+        </div>
+      </div>
+      <div class="why"><b>Why it matters.</b> At the true state the weighted
+      residual is a sum of squared standardised errors, which follows a
+      chi-square distribution with <i>&nu;</i> degrees of freedom. Anything
+      substantially larger means the readings do not fit any physically
+      consistent state &mdash; so something is wrong. This single test is the
+      classical grid's only defence against corrupted measurements, and it is
+      exactly what the attack in expression 6 is built to slip past.</div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="mathcard">
+    <header><div class="mnum">5</div><h3>AC optimal power flow &mdash; the decision under attack</h3></header>
+    <div class="inner">
+      <p>What the operator computes from the estimate: which generator should
+      produce how much, at least cost.</p>
+      <div class="formula">
+        <div class="expr">
+          min &nbsp; &sum;<sub><i>g</i></sub>
+          ( <i>a</i><sub><i>g</i></sub><i>P</i><sub><i>g</i></sub><sup>2</sup>
+          <span class="op">+</span>
+          <i>b</i><sub><i>g</i></sub><i>P</i><sub><i>g</i></sub>
+          <span class="op">+</span> <i>c</i><sub><i>g</i></sub> )
+        </div>
+        <div class="where"><b>subject to</b>
+          <span>the AC power-flow equations at every bus</span>
+          <span><i>P</i><sub><i>g</i></sub><sup>min</sup> &le; <i>P</i><sub><i>g</i></sub> &le; <i>P</i><sub><i>g</i></sub><sup>max</sup></span>
+          <span>0.90 &le; <i>V</i> &le; 1.10 pu</span>
+        </div>
+      </div>
+      <div class="why"><b>Why it matters.</b> This is the point where a data
+      attack becomes a physical and financial event. The OPF is solved on the
+      <i>estimated</i> state, not the true one. Feed it a falsified state and it
+      returns a dispatch that is optimal for a grid that does not exist &mdash;
+      which the operator then applies to the grid that does. The operator
+      causes the damage, believing the decision optimal.</div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="mathcard">
+    <header><div class="mnum">6</div><h3>Stealthy FDIA &mdash; the exact nonlinear construction</h3></header>
+    <div class="inner">
+      <p>The central expression of this project: an injection that moves the
+      estimate without moving the residual.</p>
+      <div class="formula">
+        <div class="expr">
+          <b>a</b> <span class="op">=</span> <i>h</i>(<b>x&#770;</b>
+          <span class="op">+</span> <b>c</b>) <span class="op">&minus;</span>
+          <i>h</i>(<b>x&#770;</b>)
+        </div>
+        <div class="where"><b>where</b>
+          <span><b>c</b> = the deception added to the state</span>
+          <span><b>a</b> = the injection added to the meters</span>
+        </div>
+      </div>
+      <p><b>Why the detector stays silent</b> &mdash; in three lines:</p>
+      <ol class="steps">
+        <li>The attacked readings are
+        <code>z<sub>a</sub> = z + a = z + h(x&#770; + c) &minus; h(x&#770;)</code>.</li>
+        <li>Evaluate the residual at the shifted state
+        <code>x&#770; + c</code>:<br>
+        <code>z<sub>a</sub> &minus; h(x&#770; + c)
+        = z + h(x&#770; + c) &minus; h(x&#770;) &minus; h(x&#770; + c)
+        = z &minus; h(x&#770;)</code>.</li>
+        <li>That is exactly the clean residual. So
+        <code>J(x&#770; + c) = J(x&#770;)</code> &mdash; the detector statistic
+        is unchanged, and the estimator simply converges to the false state.</li>
+      </ol>
+      <div class="formula sm">
+        <div class="expr">
+          conventional linear form: &nbsp;
+          <b>a</b> <span class="op">=</span> <b>H</b>&thinsp;<b>c</b>
+          <span style="display:inline-block;width:20px"></span>
+          error <span class="op">=</span> <i>O</i>(&#8214;<b>c</b>&#8214;<sup>2</sup>)
+        </div>
+        <div class="where"><b>the difference</b>
+          <span>the linear form is exact only as &#8214;<b>c</b>&#8214; &rarr; 0</span>
+          <span>its neglected second-order term enters the residual directly</span>
+        </div>
+      </div>
+      <div class="why"><b>Why it matters.</b> This is what separates the work
+      from the study it extends. With the linear construction, a large
+      deception leaves a second-order remainder in the residual, so big attacks
+      can trip the very alarm they were designed to evade. The exact form has
+      no remainder at all: the identity above holds for <i>any</i> attack
+      magnitude. That removes the failure mode entirely and lets the search
+      explore large deceptions safely.</div>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="mathcard">
+    <header><div class="mnum">7</div><h3>Particle Swarm Optimization &mdash; finding the worst attack</h3></header>
+    <div class="inner">
+      <p>The deception <b>c</b> has four components; the search looks for the
+      combination that does the most damage while staying stealthy.</p>
+      <div class="formula">
+        <div class="expr">
+          <b>v</b> <span class="op">&larr;</span> <i>w</i>&thinsp;<b>v</b>
+          <span class="op">+</span>
+          <i>c</i><sub>1</sub><i>r</i><sub>1</sub>(<b>p</b><sub>best</sub>
+          <span class="op">&minus;</span> <b>x</b>)
+          <span class="op">+</span>
+          <i>c</i><sub>2</sub><i>r</i><sub>2</sub>(<b>g</b><sub>best</sub>
+          <span class="op">&minus;</span> <b>x</b>)
+          <span style="display:inline-block;width:28px"></span>
+          <b>x</b> <span class="op">&larr;</span> <b>x</b>
+          <span class="op">+</span> <b>v</b>
+        </div>
+        <div class="where"><b>where</b>
+          <span><b>x</b> = [ bus<sub>&theta;</sub>, bus<sub><i>V</i></sub>, &Delta;<i>&theta;</i>, &Delta;<i>V</i> ]</span>
+          <span><i>w</i> = 0.9</span>
+          <span><i>c</i><sub>1</sub> = <i>c</i><sub>2</sub> = 2.05</span>
+          <span><i>r</i><sub>1</sub>, <i>r</i><sub>2</sub> ~ U(0,1)</span>
+        </div>
+      </div>
+      <p>Each particle is scored by a fitness that also enforces every
+      constraint:</p>
+      <div class="formula sm">
+        <div class="expr">
+          <i>f</i>(<b>c</b>) <span class="op">=</span>
+          <span style="display:inline-block;text-align:left;vertical-align:middle">
+            &minus;&Delta;<i>P</i><sub>loss</sub>
+            &nbsp;<span style="font-size:.8em;color:var(--mute)">if stealthy and feasible</span><br>
+            <span style="color:var(--red)">+&infin;</span>
+            &nbsp;<span style="font-size:.8em;color:var(--mute)">otherwise &mdash; candidate discarded</span>
+          </span>
+        </div>
+        <div class="where"><b>bounds</b>
+          <span>|&Delta;<i>&theta;</i>| &le; 0.25 rad</span>
+          <span>|&Delta;<i>V</i>| &le; 0.12 pu</span>
+          <span>feasible: 0.90 &le; <i>V</i> &le; 1.10 pu, generators within limits</span>
+        </div>
+      </div>
+      <div class="why"><b>Why it matters.</b> The damage caused by a candidate
+      attack has no closed form &mdash; finding it means running an OPF and a
+      power flow. There is no gradient to follow, so a derivative-free
+      population search is the only practical option. PSO suits this problem
+      because the four variables are mixed: two are discrete (which bus) and
+      two continuous (how much). The minus sign turns a minimiser into a
+      maximiser of damage; the +&infin; branch makes an invalid candidate die
+      immediately.<br><br>
+      One deliberate choice: a <i>negative</i> &Delta;<i>P</i><sub>loss</sub> is
+      kept as a valid result rather than discarded. The study this work extends
+      throws such candidates away &mdash; which is precisely why its method
+      could never observe what happens at light load.</div>
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="mathcard">
+    <header><div class="mnum">8</div><h3>Impact metrics &mdash; measuring the harm</h3></header>
+    <div class="inner">
+      <p>Damage is evaluated in two stages, and the order is the whole point.</p>
+      <div class="wrap"><table>
+        <thead><tr><th style="width:8%">Stage</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>The deceived AC-OPF is solved on the network <b>as it appears</b>, giving a dispatch <i>P</i><sub><i>g</i></sub><sup>att</sup></td></tr>
+          <tr><td>2</td><td>That dispatch is imposed on the <b>true</b> network by AC power flow, giving the state the grid actually reaches</td></tr>
+        </tbody>
+      </table></div>
+      <div class="formula">
+        <div class="expr">
+          &Delta;<i>P</i><sub>loss</sub> <span class="op">=</span>
+          <i>P</i><sub>loss</sub><sup>att</sup> <span class="op">&minus;</span>
+          <i>P</i><sub>loss</sub><sup>base</sup>
+          <span style="display:inline-block;width:34px"></span>
+          &Delta;<i>C</i> <span class="op">=</span>
+          <i>C</i><sup>att</sup> <span class="op">&minus;</span>
+          <i>C</i><sup>base</sup>
+        </div>
+        <div class="where"><b>where</b>
+          <span>base = the same hour with no attack</span>
+          <span>&Delta;<i>P</i><sub>loss</sub> in MW</span>
+          <span>&Delta;<i>C</i> in $ per hour</span>
+        </div>
+      </div>
+      <div class="why"><b>Why it matters.</b> Most FDIA studies stop at proving
+      the attack is undetectable. These two quantities go further and ask what
+      it actually costs &mdash; in megawatts burned as heat, and in money spent
+      running the wrong generators. Both are measured against the same hour's
+      honest baseline, so every comparison is like for like, and they are
+      reported <i>separately</i>: combining them into a single index would hide
+      any difference in how they behave.</div>
+    </div>
+  </div>
 </section>
 
 <!-- ===================================================== STANDARD DATASET -->
@@ -426,20 +761,12 @@ footer{border-top:1px solid var(--line);padding:18px 26px;color:var(--mute);
 
   <h2>The stealth condition</h2>
   <p>The attack is built with the <b>exact nonlinear</b> measurement function,
-  so the attacked data is a legitimate measurement set of a <i>different</i>
-  state and the residual is unchanged for any attack size:</p>
-  <div class="formula">
-    <div class="expr">
-      <b>a</b> <span class="op">=</span> <i>h</i>(<b>x</b>
-      <span class="op">+</span> <b>c</b>) <span class="op">&minus;</span>
-      <i>h</i>(<b>x</b>)
-    </div>
-    <div class="where"><b>where</b>
-      <span><b>c</b> = deception vector added to the state</span>
-      <span><b>a</b> = injection added to the meters</span>
-      <span>result: <i>J</i> unchanged &rArr; no alarm</span>
-    </div>
-  </div>
+  <b>a</b> = <i>h</i>(<b>x</b> + <b>c</b>) &minus; <i>h</i>(<b>x</b>), so the
+  attacked data is a legitimate measurement set of a <i>different</i> state and
+  the residual is unchanged for any attack size &mdash; the alarm never fires.</p>
+  <div class="pointer">The three-line proof, and the contrast with the
+  conventional linear form <b>a</b> = <b>Hc</b>, are in the
+  <b>Mathematics</b> tab (expression 6).</div>
 
   <h2>Choice of optimisation algorithm</h2>
   <div class="wrap"><table>
@@ -461,26 +788,9 @@ footer{border-top:1px solid var(--line);padding:18px 26px;color:var(--mute);
     <li>It must run 8,760 times per system, so cost per search matters.</li>
   </ul>
 
-  <div class="formula">
-    <div class="expr">
-      <b>v</b> <span class="op">&larr;</span> <i>w</i>&thinsp;<b>v</b>
-      <span class="op">+</span>
-      <i>c</i><sub>1</sub><i>r</i><sub>1</sub>(<b>p</b><sub>best</sub>
-      <span class="op">&minus;</span> <b>x</b>)
-      <span class="op">+</span>
-      <i>c</i><sub>2</sub><i>r</i><sub>2</sub>(<b>g</b><sub>best</sub>
-      <span class="op">&minus;</span> <b>x</b>)
-      <span style="display:inline-block;width:34px"></span>
-      <b>x</b> <span class="op">&larr;</span> <b>x</b>
-      <span class="op">+</span> <b>v</b>
-    </div>
-    <div class="where"><b>where</b>
-      <span><b>x</b> = [angle bus, voltage bus, &Delta;&theta;, &Delta;<i>V</i>]</span>
-      <span><i>w</i> = 0.9 inertia</span>
-      <span><i>c</i><sub>1</sub> = <i>c</i><sub>2</sub> = 2.05</span>
-      <span><i>r</i><sub>1</sub>, <i>r</i><sub>2</sub> = random in [0,1]</span>
-    </div>
-  </div>
+  <div class="pointer">The velocity and position update equations, and the
+  fitness function that enforces stealth and feasibility, are in the
+  <b>Mathematics</b> tab (expression 7).</div>
 
   <h2>Implementation &mdash; tools and code</h2>
   <div class="grid2">
@@ -623,7 +933,8 @@ let SYS = "ieee14";
 let DAY = 0, HOUR = 12, timer = null, pinned = null;
 
 const TABS = [
-  ["overview","Overview"],["concepts","Concepts"],["dataset","Standard Dataset"],
+  ["overview","Overview"],["concepts","Concepts"],["maths","Mathematics"],
+  ["dataset","Standard Dataset"],
   ["gridmodel","Grid Model"],["baseline","24/7 Baseline"],
   ["method","Methodology"],["roadmap","Roadmap"]
 ];
